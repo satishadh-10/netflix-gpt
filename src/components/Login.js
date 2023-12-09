@@ -1,19 +1,68 @@
 import React, { useRef, useState } from 'react'
 import Header from './Header'
 import { checkValidData } from '../utils/validation'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from '../utils/firebase';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addUser } from '../utils/userSlice';
+
 
 const Login = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     
     const [errorMessage, setErrorMessage] = useState(null)
     const [isSignIn, setIsSignIn] = useState(true)
 
-    
+    const name = useRef(null);
     const email = useRef(null);
     const password = useRef(null);
     
        const handleButtonClick = () => {
         const message = checkValidData(email.current.value, password.current.value)
         setErrorMessage(message);
+        if(message) return;
+
+        if(!isSignIn) {
+              //sign up logic
+   createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+  .then((userCredential) => {
+    
+    const user = userCredential.user;
+    updateProfile(auth.currentUser, {
+        displayName: name.current.value, photoURL: "https://avatars.githubusercontent.com/u/126259184?v=4"
+      }).then(() => {
+        const {uid, email, displayName, photoURL} = auth.currentUser;
+                  dispatch(addUser({ uid: uid, email: email, displayName: displayName, photoURL: photoURL }));
+        navigate("/browse")
+      }).catch((error) => {
+        setErrorMessage(error.message)
+      });
+    console.log(user);
+    
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    setErrorMessage(errorCode + "-" + errorMessage)
+  });
+        }
+        else{
+               //sign in logic
+               signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+  .then((userCredential) => {
+    const user = userCredential.user;
+    console.log(user);
+    navigate("/browse")
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    setErrorMessage(errorCode + "-" + errorMessage)
+  });
+
+        }
     }
 
     const toogleSignInform = () => {
@@ -32,7 +81,7 @@ const Login = () => {
              className='text-4xl font-semibold py-4 my-2'>{ isSignIn ? "Sign In" : "Sign Up" }
              </h1>
 
-            {!isSignIn && <input  type='text' placeholder='Name' className='p-3 my-2 w-full bg-zinc-700 rounded-md'/>}
+            {!isSignIn && <input ref={name} type='text' placeholder='Name' className='p-3 my-2 w-full bg-zinc-700 rounded-md'/>}
 
             <input
              ref={email}
