@@ -39,7 +39,7 @@ const Login = () => {
       }).catch((error) => {
         setErrorMessage(error.message)
       });
-    //console.log(user);
+    
     
   })
   .catch((error) => {
@@ -72,7 +72,7 @@ const Login = () => {
     <div>
         <Header/>
         <div className='absolute '>
-            <img src={BODY_IMG_URL}
+            <img className='h-screen object-cover md:h-full' src={BODY_IMG_URL}
             alt='bodyImage'/>
         </div>
         <form onSubmit={(e) => e.preventDefault()} 

@@ -5,14 +5,17 @@ import { BODY_IMG_URL } from '../utils/constants'
 
 const GptSearch = () => {
   return (
-    <div>
-        <div className='absolute -z-10 '>
-            <img src = {BODY_IMG_URL}
+    <>
+        <div className='fixed -z-10 '>
+            <img className='h-screen object-cover md:h-full' src = {BODY_IMG_URL}
             alt='bodyImage'/>
         </div>
+        <div>
         <GptSearchBar/>
         <GptMovieSuggestion/>
-    </div>
+        </div>
+    
+    </>
   )
 }
 
